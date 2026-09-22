@@ -22,6 +22,7 @@ class MainController final : public engine::core::Controller {
         void end_draw() override;
 
         void update_camera();
+        void draw_scene();
 
         bool m_cursor_enabled{true};
 };

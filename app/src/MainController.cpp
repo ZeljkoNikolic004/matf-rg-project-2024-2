@@ -36,6 +36,7 @@ void MainController::begin_draw() {
 }
 
 void MainController::draw() {
+    draw_scene();
 }
 
 void MainController::end_draw() {
@@ -63,6 +64,20 @@ void MainController::update_camera() {
     auto mouse = platform->mouse();
     camera->rotate_camera(mouse.dx, mouse.dy);
     camera->zoom(mouse.scroll);
+}
+
+void MainController::draw_scene() {
+    auto graphics  = engine::core::Controller::get<engine::graphics::GraphicsController>();
+    auto resources = engine::core::Controller::get<engine::resources::ResourcesController>();
+    auto shader = resources->shader("scene");
+    auto scene = resources->model("scene");
+
+    shader->use();
+    shader->set_mat4("model", glm::mat4(1.0f));
+    shader->set_mat4("view", graphics->camera()->view_matrix());
+    shader->set_mat4("projection", graphics->projection_matrix());
+
+    scene->draw(shader);
 }
 
 }

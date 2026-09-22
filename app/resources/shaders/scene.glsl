@@ -17,7 +17,7 @@ void main() {
     FragPos = vec3(model * vec4(aPos, 1.0));
     Normal = mat3(transpose(inverse(model))) * aNormal;
     TexCoords = aTexCoords;
-    gl_position = projection * view * vec4(FragPos, 1.0);
+    gl_Position = projection * view * vec4(FragPos, 1.0);
 }
 
 //#shader fragment
@@ -25,7 +25,7 @@ void main() {
 
 out vec4 FragColor;
 
-in vec2 TexCord;
+in vec2 TexCoords;
 
 uniform sampler2D texture_diffuse1;
 

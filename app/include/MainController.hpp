@@ -14,12 +14,14 @@ class MainController final : public engine::core::Controller {
 
     private:
         void initialize() override;
-        void loop() override;
+        bool loop() override;
         void poll_events() override;
         void update() override;
         void begin_draw() override;
         void draw() override;
         void end_draw() override;
+
+        void update_camera();
 };
 
 }

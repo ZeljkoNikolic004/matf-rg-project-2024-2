@@ -19,6 +19,12 @@ bool MainController::loop() {
 }
 
 void MainController::poll_events() {
+    auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
+
+    if (platform->key(engine::platform::KEY_F1).state() == engine::platform::Key::State::JustPressed) {
+        m_cursor_enabled = !m_cursor_enabled;
+        platform->set_enable_cursor(m_cursor_enabled);
+    }
 }
 
 void MainController::update() {

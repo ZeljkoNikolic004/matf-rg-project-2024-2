@@ -25,6 +25,10 @@ class MainController final : public engine::core::Controller {
         void draw_scene();
 
         bool m_cursor_enabled{true};
+
+        glm::vec3 m_dir_light_direction{-1.0f, -1.0f, -1.0f};
+        glm::vec3 m_dir_light_color{1.0f, 1.0f, 1.0f};
+        bool m_dir_light_enabled{true};
 };
 
 }

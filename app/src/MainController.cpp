@@ -77,6 +77,12 @@ void MainController::draw_scene() {
     shader->set_mat4("view", graphics->camera()->view_matrix());
     shader->set_mat4("projection", graphics->projection_matrix());
 
+    shader->set_vec3("viewPos", graphics->camera()->Position);
+
+    shader->set_bool("dirLight.enabled", m_dir_light_enabled);
+    shader->set_vec3("dirLight.direction", m_dir_light_direction);
+    shader->set_vec3("dirLight.color", m_dir_light_color);
+
     scene->draw(shader);
 }
 

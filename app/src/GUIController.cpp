@@ -20,7 +20,7 @@ void GUIController::poll_events() {
 
 void GUIController::draw() {
     auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
-    auto main     = engine::core::Controller::get<MainController>();
+    auto main = engine::core::Controller::get<MainController>();
 
     graphics->begin_gui();
 
@@ -30,7 +30,7 @@ void GUIController::draw() {
     ImGui::Checkbox("Directional enabled", &main->m_dir_light_enabled);
     ImGui::ColorEdit3("Directional color", &main->m_dir_light_color[0]);
     ImGui::DragFloat3("Directional direction", &main->m_dir_light_direction[0],
-        0.05f, -1.0f,1.0f);
+                      0.05f, -1.0f, 1.0f);
 
     ImGui::Separator();
 
@@ -43,8 +43,7 @@ void GUIController::draw() {
     ImGui::Text("Event (SPACE = start, R = reset)");
     if (main->m_scene_visible) {
         ImGui::Text("Scene visible: yes");
-    }
-    else {
+    } else {
         ImGui::Text("Scene visible: no");
     }
 

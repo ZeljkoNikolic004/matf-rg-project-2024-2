@@ -1,8 +1,8 @@
 #include "MainController.hpp"
+#include "GUIController.hpp"
 #include <engine/core/Engine.hpp>
 #include <engine/graphics/GraphicsController.hpp>
 #include <spdlog/spdlog.h>
-#include "GUIController.hpp"
 
 namespace app {
 
@@ -98,7 +98,7 @@ void MainController::update_camera() {
 }
 
 void MainController::draw_scene() {
-    auto graphics  = engine::core::Controller::get<engine::graphics::GraphicsController>();
+    auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
     auto resources = engine::core::Controller::get<engine::resources::ResourcesController>();
     auto shader = resources->shader("scene");
     auto scene = resources->model("scene");

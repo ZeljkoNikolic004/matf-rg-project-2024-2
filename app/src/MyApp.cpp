@@ -1,6 +1,6 @@
 #include "MyApp.hpp"
-#include "MainController.hpp"
 #include "GUIController.hpp"
+#include "MainController.hpp"
 
 
 namespace app {

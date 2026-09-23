@@ -23,12 +23,46 @@ void main() {
 //#shader fragment
 #version 330 core
 
+struct DirLight {
+    bool enabled;
+    vec3 direction;
+    vec3 color;
+};
+
 out vec4 FragColor;
 
+in vec3 FragPos;
+in vec3 Normal;
 in vec2 TexCoords;
 
 uniform sampler2D texture_diffuse1;
+uniform vec3 viewPos;
+uniform DirLight dirLight;
+
+vec3 calculate_dir_light(DirLight light, vec3 normal, vec3 view_dir, vec3 base_color){
+    if(!light.enabled){
+        return vec3(0.0);
+    }
+
+    vec3 light_dir = normalize(-light.direction);
+    float diff = max(dot(normal, light_dir), 0.0);
+
+    vec3 reflect_dir = reflect(-light_dir, normal);
+    float spec = pow(max(dot(view_dir, reflect_dir), 0.0), 32.0);
+
+    vec3 ambient = 0.1 * light.color * base_color;
+    vec3 diffuse = diff * light.color * base_color;
+    vec3 specular = spec * light.color * 0.3;
+
+    return ambient + diffuse + specular;
+}
 
 void main() {
+    vec3 normal = normalize(Normal);
+    vec3 view_dir = normalize(viewPos - FragPos);
+    vec3 base_color = texture(texture_diffuse1, TexCoords).rgb;
+
+    vec3 result = calculate_dir_light(dirLight, normal, view_dir, base_color);
+
     FragColor = vec4(texture(texture_diffuse1, TexCoords).rgb, 1.0);
 }

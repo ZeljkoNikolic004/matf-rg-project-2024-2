@@ -39,6 +39,15 @@ void GUIController::draw() {
     ImGui::ColorEdit3("Point color", &main->m_point_light_color[0]);
     ImGui::DragFloat3("Point position", &main->m_point_light_position[0], 0.1f);
 
+    ImGui::Separator();
+    ImGui::Text("Event (SPACE = start, R = reset)");
+    if (main->m_scene_visible) {
+        ImGui::Text("Scene visible: yes");
+    }
+    else {
+        ImGui::Text("Scene visible: no");
+    }
+
 
     ImGui::End();
     graphics->end_gui();

@@ -2,6 +2,7 @@
 #include <engine/core/Engine.hpp>
 #include <engine/graphics/GraphicsController.hpp>
 #include <spdlog/spdlog.h>
+#include "GUIController.hpp"
 
 namespace app {
 
@@ -64,6 +65,12 @@ void MainController::end_draw() {
 }
 
 void MainController::update_camera() {
+    auto gui = engine::core::Controller::get<GUIController>();
+
+    if (gui->is_enabled()) {
+        return;
+    }
+
     auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
     auto camera = engine::core::Controller::get<engine::graphics::GraphicsController>()->camera();
     float dt = platform->dt();

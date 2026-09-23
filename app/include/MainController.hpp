@@ -27,8 +27,12 @@ class MainController final : public engine::core::Controller {
         bool m_cursor_enabled{true};
 
         glm::vec3 m_dir_light_direction{-1.0f, -1.0f, -1.0f};
-        glm::vec3 m_dir_light_color{1.0f, 1.0f, 1.0f};
+        glm::vec3 m_dir_light_color{0.0f, 1.0f, 0.0f};
         bool m_dir_light_enabled{true};
+
+        glm::vec3 m_point_light_position{1.0f, 1.0f, 1.0f};
+        glm::vec3 m_point_light_color{1.0f, 0.0f, 0.0f};
+        bool m_point_light_enabled{true};
 };
 
 }

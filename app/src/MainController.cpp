@@ -83,6 +83,10 @@ void MainController::draw_scene() {
     shader->set_vec3("dirLight.direction", m_dir_light_direction);
     shader->set_vec3("dirLight.color", m_dir_light_color);
 
+    shader->set_bool("pointLight.enabled", m_point_light_enabled);
+    shader->set_vec3("pointLight.position", m_point_light_position);
+    shader->set_vec3("pointLight.color", m_point_light_color);
+
     scene->draw(shader);
 }
 

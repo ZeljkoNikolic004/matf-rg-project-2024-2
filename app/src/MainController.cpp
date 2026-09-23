@@ -49,6 +49,7 @@ void MainController::poll_events() {
 
 void MainController::update() {
     update_camera();
+    update_event();
 }
 
 void MainController::begin_draw() {
@@ -56,7 +57,9 @@ void MainController::begin_draw() {
 }
 
 void MainController::draw() {
-    draw_scene();
+    if (m_scene_visible) {
+        draw_scene();
+    }
 }
 
 void MainController::end_draw() {
@@ -110,4 +113,24 @@ void MainController::draw_scene() {
     scene->draw(shader);
 }
 
+void MainController::update_event() {
+    auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
+    float now = platform->frame_time().current;
+
+    if (m_state == State::WaitingForEventA && now - m_event_a_time >= A_SECONDS) {
+        m_point_light_color = glm::vec3{1.0f, 0.0f, 0.0f};
+        m_event_b_time = now;
+        m_state = State::WaitingForEventB;
+
+        spdlog::info("EVENT_A: point light color changed to red, EVENT_B in {} seconds", B_SECONDS);
+    }
+
+    if (m_state == State::WaitingForEventB && now - m_event_b_time >= B_SECONDS) {
+        m_scene_visible = false;
+        m_state = State::Finished;
+
+        spdlog::info("EVENT_B: scene model hidden");
+    }
 }
+
+}// namespace app

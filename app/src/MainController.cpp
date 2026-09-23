@@ -8,6 +8,10 @@ namespace app {
 
 void MainController::initialize() {
     engine::graphics::OpenGL::enable_depth_testing();
+
+    auto camera = engine::core::Controller::get<engine::graphics::GraphicsController>()->camera();
+    camera->Position = glm::vec3(-1.0f, 2.5f, 5.0f);
+    camera->Pitch = -15.0f;
 }
 
 bool MainController::loop() {
@@ -100,7 +104,7 @@ void MainController::draw_scene() {
     auto scene = resources->model("scene");
 
     shader->use();
-    shader->set_mat4("model", glm::mat4(1.0f));
+    shader->set_mat4("model", glm::mat4(0.3f));
     shader->set_mat4("view", graphics->camera()->view_matrix());
     shader->set_mat4("projection", graphics->projection_matrix());
 

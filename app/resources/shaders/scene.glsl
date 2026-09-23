@@ -29,6 +29,12 @@ struct DirLight {
     vec3 color;
 };
 
+struct PointLight {
+    bool enabled;
+    vec3 position;
+    vec3 color;
+};
+
 out vec4 FragColor;
 
 in vec3 FragPos;
@@ -38,6 +44,7 @@ in vec2 TexCoords;
 uniform sampler2D texture_diffuse1;
 uniform vec3 viewPos;
 uniform DirLight dirLight;
+uniform PointLight pointLight;
 
 vec3 calculate_dir_light(DirLight light, vec3 normal, vec3 view_dir, vec3 base_color){
     if(!light.enabled){
@@ -57,12 +64,35 @@ vec3 calculate_dir_light(DirLight light, vec3 normal, vec3 view_dir, vec3 base_c
     return ambient + diffuse + specular;
 }
 
+vec3 calculate_point_light(PointLight light, vec3 normal, vec3 frag_pos, vec3 view_dir, vec3 base_color){
+    if(!light.enabled){
+        return vec3(0.0);
+    }
+
+    vec3 light_dir = normalize(light.position - frag_pos);
+    float diff = max(dot(normal, light_dir), 0.0);
+
+    vec3 reflect_dir = reflect(-light_dir, normal);
+    float spec = pow(max(dot(view_dir, reflect_dir), 0.0), 32.0);
+
+    float distance = length(light.position - frag_pos);
+    float attenuation = 1.0 / (1.0 + 0.09 * distance + 0.032 * distance * distance);
+
+    vec3 ambient = 0.05 * light.color * base_color;
+    vec3 diffuse = diff * light.color * base_color;
+    vec3 specular = spec * light.color * 0.3;
+
+    return (ambient + diffuse + specular) * attenuation;
+}
+
 void main() {
     vec3 normal = normalize(Normal);
     vec3 view_dir = normalize(viewPos - FragPos);
     vec3 base_color = texture(texture_diffuse1, TexCoords).rgb;
 
-    vec3 result = calculate_dir_light(dirLight, normal, view_dir, base_color);
+    vec3 result = vec3(0.0);
+    result += calculate_dir_light(dirLight, normal, view_dir, base_color);
+    result += calculate_point_light(pointLight, normal, FragPos, view_dir, base_color);
 
-    FragColor = vec4(texture(texture_diffuse1, TexCoords).rgb, 1.0);
+    FragColor = vec4(result, 1.0);
 }

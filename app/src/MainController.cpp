@@ -1,6 +1,7 @@
 #include "MainController.hpp"
 #include <engine/core/Engine.hpp>
 #include <engine/graphics/GraphicsController.hpp>
+#include <spdlog/spdlog.h>
 
 namespace app {
 
@@ -27,6 +28,22 @@ void MainController::poll_events() {
     if (platform->key(engine::platform::KEY_F1).state() == engine::platform::Key::State::JustPressed) {
         m_cursor_enabled = !m_cursor_enabled;
         platform->set_enable_cursor(m_cursor_enabled);
+    }
+
+    if (platform->key(engine::platform::KEY_SPACE).state() == engine::platform::Key::State::JustPressed &&
+        m_state == State::Idle) {
+        m_event_a_time = platform->frame_time().current;
+        m_state = State::WaitingForEventA;
+
+        spdlog::info("ACTION_X: event started, EVENT_A in {} seconds", A_SECONDS);
+    }
+
+    if (platform->key(engine::platform::KEY_R).state() == engine::platform::Key::State::JustPressed) {
+        m_state = State::Idle;
+        m_scene_visible = true;
+        m_point_light_color = glm::vec3{1.0f};
+
+        spdlog::info("Event chain reset");
     }
 }
 

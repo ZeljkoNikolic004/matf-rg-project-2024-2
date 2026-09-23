@@ -46,6 +46,8 @@ class MainController final : public engine::core::Controller {
         glm::vec3 m_point_light_color{1.0f, 0.0f, 0.0f};
         bool m_point_light_enabled{true};
 
+        bool m_scene_visible{true};
+
         State m_state{State::Idle};
         float m_event_a_time{0.0f};
         float m_event_b_time{0.0f};

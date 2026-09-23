@@ -5,9 +5,6 @@
 
 namespace app {
 
-const float MainController::A_SECONDS = 2.0f;
-const float MainController::B_SECONDS = 3.0f;
-
 void MainController::initialize() {
     engine::graphics::OpenGL::enable_depth_testing();
 }

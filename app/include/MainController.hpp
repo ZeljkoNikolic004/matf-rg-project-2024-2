@@ -14,14 +14,15 @@ enum class State {
 };
 
 class MainController final : public engine::core::Controller {
+    friend class GUIController;
     public:
         std::string_view name() const override {
             return "app::MainController";
         }
 
     private:
-        static const float A_SECONDS;
-        static const float B_SECONDS;
+        inline static const float A_SECONDS = 2.0f;
+        inline static const float B_SECONDS = 3.0f;
 
         void initialize() override;
         bool loop() override;

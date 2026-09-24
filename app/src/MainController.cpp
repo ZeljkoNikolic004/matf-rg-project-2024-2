@@ -34,10 +34,10 @@ void MainController::poll_events() {
 
     if (platform->key(engine::platform::KEY_SPACE).state() == engine::platform::Key::State::JustPressed &&
         m_state == State::Idle) {
-        m_event_a_time = platform->frame_time().current;
+        m_event_change_color_time = platform->frame_time().current;
         m_state = State::ChangingPointLightColor;
 
-        spdlog::info("ACTION_X: event started, EVENT_A in {} seconds", A_SECONDS);
+        spdlog::info("SPACE_PRESSED: event started, EVENT_CHANGING_POINT_LIGHT_COLOR in {} seconds", CHANGING_COLOR_SECONDS);
     }
 
     if (platform->key(engine::platform::KEY_R).state() == engine::platform::Key::State::JustPressed) {
@@ -129,19 +129,19 @@ void MainController::update_event() {
     auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
     float now = platform->frame_time().current;
 
-    if (m_state == State::ChangingPointLightColor && now - m_event_a_time >= A_SECONDS) {
+    if (m_state == State::ChangingPointLightColor && now - m_event_change_color_time >= CHANGING_COLOR_SECONDS) {
         m_point_light.set_color(glm::vec3{1.0f, 0.0f, 0.0f});
-        m_event_b_time = now;
+        m_event_remove_scene_time = now;
         m_state = State::RemovingScene;
 
-        spdlog::info("EVENT_A: point light color changed to red, EVENT_B in {} seconds", B_SECONDS);
+        spdlog::info("EVENT_CHANGING_POINT_LIGHT_COLOR: point light color changed to red, EVENT_REMOVING_SCENE in {} seconds", REMOVING_SCENE_SECONDS);
     }
 
-    if (m_state == State::RemovingScene && now - m_event_b_time >= B_SECONDS) {
+    if (m_state == State::RemovingScene && now - m_event_remove_scene_time >= REMOVING_SCENE_SECONDS) {
         m_scene_visible = false;
         m_state = State::Finished;
 
-        spdlog::info("EVENT_B: scene model hidden");
+        spdlog::info("EVENT_REMOVING_SCENE: scene model hidden");
     }
 }
 

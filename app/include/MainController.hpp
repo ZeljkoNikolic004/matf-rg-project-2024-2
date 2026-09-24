@@ -50,8 +50,8 @@ public:
     }
 
 private:
-    inline static const float A_SECONDS = 2.0f;
-    inline static const float B_SECONDS = 3.0f;
+    inline static const float CHANGING_COLOR_SECONDS = 2.0f;
+    inline static const float REMOVING_SCENE_SECONDS = 3.0f;
 
     void initialize() override;
     bool loop() override;
@@ -74,8 +74,8 @@ private:
     bool m_scene_visible{true};
 
     State m_state{State::Idle};
-    float m_event_a_time{0.0f};
-    float m_event_b_time{0.0f};
+    float m_event_change_color_time{0.0f};
+    float m_event_remove_scene_time{0.0f};
 };
 
 }// namespace app

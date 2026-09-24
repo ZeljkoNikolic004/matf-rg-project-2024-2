@@ -26,13 +26,17 @@ void main() {
 struct DirLight {
     bool enabled;
     vec3 direction;
-    vec3 color;
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
 };
 
 struct PointLight {
     bool enabled;
     vec3 position;
-    vec3 color;
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
 };
 
 out vec4 FragColor;
@@ -57,9 +61,9 @@ vec3 calculate_dir_light(DirLight light, vec3 normal, vec3 view_dir, vec3 base_c
     vec3 reflect_dir = reflect(-light_dir, normal);
     float spec = pow(max(dot(view_dir, reflect_dir), 0.0), 32.0);
 
-    vec3 ambient = 0.1 * light.color * base_color;
-    vec3 diffuse = diff * light.color * base_color;
-    vec3 specular = spec * light.color * 0.3;
+    vec3 ambient = light.ambient * base_color;
+    vec3 diffuse = diff * light.diffuse * base_color;
+    vec3 specular = spec * light.specular;
 
     return ambient + diffuse + specular;
 }
@@ -78,9 +82,9 @@ vec3 calculate_point_light(PointLight light, vec3 normal, vec3 frag_pos, vec3 vi
     float distance = length(light.position - frag_pos);
     float attenuation = 1.0 / (1.0 + 0.09 * distance + 0.032 * distance * distance);
 
-    vec3 ambient = 0.05 * light.color * base_color;
-    vec3 diffuse = diff * light.color * base_color;
-    vec3 specular = spec * light.color * 0.3;
+    vec3 ambient = light.ambient * base_color;
+    vec3 diffuse = diff * light.diffuse * base_color;
+    vec3 specular = spec * light.specular;
 
     return (ambient + diffuse + specular) * attenuation;
 }

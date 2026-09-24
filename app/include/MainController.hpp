@@ -8,9 +8,37 @@ namespace app {
 
 enum class State {
     Idle,
-    WaitingForEventA,
-    WaitingForEventB,
+    ChangingPointLightColor,
+    RemovingScene,
     Finished
+};
+
+struct DirLight {
+    bool enabled{true};
+    glm::vec3 direction{-1.0f, -1.0f, -1.0f};
+    glm::vec3 ambient{0.06f, 0.06f, 0.06f};
+    glm::vec3 diffuse{0.6f, 0.6f, 0.6f};
+    glm::vec3 specular{0.2f, 0.2f, 0.2f};
+
+    void set_color(const glm::vec3 &color) {
+        diffuse = color;
+        ambient = color * 0.1f;
+        specular = color * 0.3f;
+    }
+};
+
+struct PointLight {
+    bool enabled{true};
+    glm::vec3 position{1.0f, 3.0f, 0.0f};
+    glm::vec3 ambient{0.05f, 0.05f, 0.05f};
+    glm::vec3 diffuse{1.0f, 1.0f, 1.0f};
+    glm::vec3 specular{0.3f, 0.3f, 0.3f};
+
+    void set_color(const glm::vec3 &color) {
+        diffuse = color;
+        ambient = color * 0.05f;
+        specular = color * 0.3f;
+    }
 };
 
 class MainController final : public engine::core::Controller {
@@ -40,13 +68,8 @@ private:
 
     bool m_cursor_enabled{true};
 
-    glm::vec3 m_dir_light_direction{-1.0f, -1.0f, -1.0f};
-    glm::vec3 m_dir_light_color{0.6f, 0.6f, 0.6f};
-    bool m_dir_light_enabled{true};
-
-    glm::vec3 m_point_light_position{1.0f, 3.0f, 0.0f};
-    glm::vec3 m_point_light_color{1.0f, 1.0f, 1.0f};
-    bool m_point_light_enabled{true};
+    DirLight m_dir_light{};
+    PointLight m_point_light{};
 
     bool m_scene_visible{true};
 

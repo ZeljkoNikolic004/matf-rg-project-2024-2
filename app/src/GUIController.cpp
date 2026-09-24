@@ -27,17 +27,19 @@ void GUIController::draw() {
     ImGui::Begin("Lighting");
 
     ImGui::Text("Directional light");
-    ImGui::Checkbox("Directional enabled", &main->m_dir_light_enabled);
-    ImGui::ColorEdit3("Directional color", &main->m_dir_light_color[0]);
-    ImGui::DragFloat3("Directional direction", &main->m_dir_light_direction[0],
+    ImGui::Checkbox("Directional enabled", &main->m_dir_light.enabled);
+    ImGui::ColorEdit3("Directional color", &main->m_dir_light.diffuse[0]);
+    main->m_dir_light.set_color(main->m_dir_light.diffuse);
+    ImGui::DragFloat3("Directional direction", &main->m_dir_light.direction[0],
                       0.05f, -1.0f, 1.0f);
 
     ImGui::Separator();
 
     ImGui::Text("Point light");
-    ImGui::Checkbox("Point enabled", &main->m_point_light_enabled);
-    ImGui::ColorEdit3("Point color", &main->m_point_light_color[0]);
-    ImGui::DragFloat3("Point position", &main->m_point_light_position[0], 0.1f);
+    ImGui::Checkbox("Point enabled", &main->m_point_light.enabled);
+    ImGui::ColorEdit3("Point color", &main->m_point_light.diffuse[0]);
+    main->m_point_light.set_color(main->m_point_light.diffuse);
+    ImGui::DragFloat3("Point position", &main->m_point_light.position[0], 0.1f);
 
     ImGui::Separator();
     ImGui::Text("Event (SPACE = start, R = reset)");

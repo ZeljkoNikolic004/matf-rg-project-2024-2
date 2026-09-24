@@ -35,7 +35,7 @@ void MainController::poll_events() {
     if (platform->key(engine::platform::KEY_SPACE).state() == engine::platform::Key::State::JustPressed &&
         m_state == State::Idle) {
         m_event_a_time = platform->frame_time().current;
-        m_state = State::WaitingForEventA;
+        m_state = State::ChangingPointLightColor;
 
         spdlog::info("ACTION_X: event started, EVENT_A in {} seconds", A_SECONDS);
     }
@@ -43,7 +43,7 @@ void MainController::poll_events() {
     if (platform->key(engine::platform::KEY_R).state() == engine::platform::Key::State::JustPressed) {
         m_state = State::Idle;
         m_scene_visible = true;
-        m_point_light_color = glm::vec3{1.0f};
+        m_point_light.set_color(glm::vec3{1.0f, 1.0f, 1.0f});
 
         spdlog::info("Event chain reset");
     }
@@ -110,13 +110,17 @@ void MainController::draw_scene() {
 
     shader->set_vec3("viewPos", graphics->camera()->Position);
 
-    shader->set_bool("dirLight.enabled", m_dir_light_enabled);
-    shader->set_vec3("dirLight.direction", m_dir_light_direction);
-    shader->set_vec3("dirLight.color", m_dir_light_color);
+    shader->set_bool("dirLight.enabled", m_dir_light.enabled);
+    shader->set_vec3("dirLight.direction", m_dir_light.direction);
+    shader->set_vec3("dirLight.ambient", m_dir_light.ambient);
+    shader->set_vec3("dirLight.diffuse", m_dir_light.diffuse);
+    shader->set_vec3("dirLight.specular", m_dir_light.specular);
 
-    shader->set_bool("pointLight.enabled", m_point_light_enabled);
-    shader->set_vec3("pointLight.position", m_point_light_position);
-    shader->set_vec3("pointLight.color", m_point_light_color);
+    shader->set_bool("pointLight.enabled", m_point_light.enabled);
+    shader->set_vec3("pointLight.position", m_point_light.position);
+    shader->set_vec3("pointLight.ambient", m_point_light.ambient);
+    shader->set_vec3("pointLight.diffuse", m_point_light.diffuse);
+    shader->set_vec3("pointLight.specular", m_point_light.specular);
 
     scene->draw(shader);
 }
@@ -125,15 +129,15 @@ void MainController::update_event() {
     auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
     float now = platform->frame_time().current;
 
-    if (m_state == State::WaitingForEventA && now - m_event_a_time >= A_SECONDS) {
-        m_point_light_color = glm::vec3{1.0f, 0.0f, 0.0f};
+    if (m_state == State::ChangingPointLightColor && now - m_event_a_time >= A_SECONDS) {
+        m_point_light.set_color(glm::vec3{1.0f, 0.0f, 0.0f});
         m_event_b_time = now;
-        m_state = State::WaitingForEventB;
+        m_state = State::RemovingScene;
 
         spdlog::info("EVENT_A: point light color changed to red, EVENT_B in {} seconds", B_SECONDS);
     }
 
-    if (m_state == State::WaitingForEventB && now - m_event_b_time >= B_SECONDS) {
+    if (m_state == State::RemovingScene && now - m_event_b_time >= B_SECONDS) {
         m_scene_visible = false;
         m_state = State::Finished;
 

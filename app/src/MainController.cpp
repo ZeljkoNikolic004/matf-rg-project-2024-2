@@ -1,0 +1,148 @@
+#include "MainController.hpp"
+#include "GUIController.hpp"
+#include <engine/core/Engine.hpp>
+#include <engine/graphics/GraphicsController.hpp>
+#include <spdlog/spdlog.h>
+
+namespace app {
+
+void MainController::initialize() {
+    engine::graphics::OpenGL::enable_depth_testing();
+
+    auto camera = engine::core::Controller::get<engine::graphics::GraphicsController>()->camera();
+    camera->Position = glm::vec3(-1.0f, 2.5f, 5.0f);
+    camera->Pitch = -15.0f;
+}
+
+bool MainController::loop() {
+    auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
+
+    if (platform->key(engine::platform::KEY_ESCAPE).state() == engine::platform::Key::State::JustPressed) {
+        return false;
+    }
+
+    return true;
+}
+
+void MainController::poll_events() {
+    auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
+
+    if (platform->key(engine::platform::KEY_F1).state() == engine::platform::Key::State::JustPressed) {
+        m_cursor_enabled = !m_cursor_enabled;
+        platform->set_enable_cursor(m_cursor_enabled);
+    }
+
+    if (platform->key(engine::platform::KEY_SPACE).state() == engine::platform::Key::State::JustPressed &&
+        m_state == State::Idle) {
+        m_event_change_color_time = platform->frame_time().current;
+        m_state = State::ChangingPointLightColor;
+
+        spdlog::info("SPACE_PRESSED: event started, EVENT_CHANGING_POINT_LIGHT_COLOR in {} seconds", CHANGING_COLOR_SECONDS);
+    }
+
+    if (platform->key(engine::platform::KEY_R).state() == engine::platform::Key::State::JustPressed) {
+        m_state = State::Idle;
+        m_scene_visible = true;
+        m_point_light.set_color(glm::vec3{1.0f, 1.0f, 1.0f});
+
+        spdlog::info("Event chain reset");
+    }
+}
+
+void MainController::update() {
+    update_camera();
+    update_event();
+}
+
+void MainController::begin_draw() {
+    engine::graphics::OpenGL::clear_buffers();
+}
+
+void MainController::draw() {
+    if (m_scene_visible) {
+        draw_scene();
+    }
+}
+
+void MainController::end_draw() {
+    engine::core::Controller::get<engine::platform::PlatformController>()->swap_buffers();
+}
+
+void MainController::update_camera() {
+    auto gui = engine::core::Controller::get<GUIController>();
+
+    if (gui->is_enabled()) {
+        return;
+    }
+
+    auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
+    auto camera = engine::core::Controller::get<engine::graphics::GraphicsController>()->camera();
+    float dt = platform->dt();
+
+    if (platform->key(engine::platform::KEY_W).state() == engine::platform::Key::State::Pressed) {
+        camera->move_camera(engine::graphics::Camera::Movement::FORWARD, dt);
+    }
+    if (platform->key(engine::platform::KEY_S).state() == engine::platform::Key::State::Pressed) {
+        camera->move_camera(engine::graphics::Camera::Movement::BACKWARD, dt);
+    }
+    if (platform->key(engine::platform::KEY_A).state() == engine::platform::Key::State::Pressed) {
+        camera->move_camera(engine::graphics::Camera::Movement::LEFT, dt);
+    }
+    if (platform->key(engine::platform::KEY_D).state() == engine::platform::Key::State::Pressed) {
+        camera->move_camera(engine::graphics::Camera::Movement::RIGHT, dt);
+    }
+
+    auto mouse = platform->mouse();
+    camera->rotate_camera(mouse.dx, mouse.dy);
+    camera->zoom(mouse.scroll);
+}
+
+void MainController::draw_scene() {
+    auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
+    auto resources = engine::core::Controller::get<engine::resources::ResourcesController>();
+    auto shader = resources->shader("scene");
+    auto scene = resources->model("scene");
+
+    shader->use();
+    shader->set_mat4("model", glm::mat4(0.3f));
+    shader->set_mat4("view", graphics->camera()->view_matrix());
+    shader->set_mat4("projection", graphics->projection_matrix());
+
+    shader->set_vec3("viewPos", graphics->camera()->Position);
+
+    shader->set_bool("dirLight.enabled", m_dir_light.enabled);
+    shader->set_vec3("dirLight.direction", m_dir_light.direction);
+    shader->set_vec3("dirLight.ambient", m_dir_light.ambient);
+    shader->set_vec3("dirLight.diffuse", m_dir_light.diffuse);
+    shader->set_vec3("dirLight.specular", m_dir_light.specular);
+
+    shader->set_bool("pointLight.enabled", m_point_light.enabled);
+    shader->set_vec3("pointLight.position", m_point_light.position);
+    shader->set_vec3("pointLight.ambient", m_point_light.ambient);
+    shader->set_vec3("pointLight.diffuse", m_point_light.diffuse);
+    shader->set_vec3("pointLight.specular", m_point_light.specular);
+
+    scene->draw(shader);
+}
+
+void MainController::update_event() {
+    auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
+    float now = platform->frame_time().current;
+
+    if (m_state == State::ChangingPointLightColor && now - m_event_change_color_time >= CHANGING_COLOR_SECONDS) {
+        m_point_light.set_color(glm::vec3{1.0f, 0.0f, 0.0f});
+        m_event_remove_scene_time = now;
+        m_state = State::RemovingScene;
+
+        spdlog::info("EVENT_CHANGING_POINT_LIGHT_COLOR: point light color changed to red, EVENT_REMOVING_SCENE in {} seconds", REMOVING_SCENE_SECONDS);
+    }
+
+    if (m_state == State::RemovingScene && now - m_event_remove_scene_time >= REMOVING_SCENE_SECONDS) {
+        m_scene_visible = false;
+        m_state = State::Finished;
+
+        spdlog::info("EVENT_REMOVING_SCENE: scene model hidden");
+    }
+}
+
+}// namespace app
